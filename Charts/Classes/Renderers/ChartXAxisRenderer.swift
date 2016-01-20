@@ -219,34 +219,84 @@ public class ChartXAxisRenderer: ChartAxisRendererBase
         }
 
         CGContextSetStrokeColorWithColor(context, _xAxis.gridColor.CGColor)
-        CGContextSetLineWidth(context, _xAxis.gridLineWidth)
-        if (_xAxis.gridLineDashLengths != nil)
-        {
-            CGContextSetLineDash(context, _xAxis.gridLineDashPhase, _xAxis.gridLineDashLengths, _xAxis.gridLineDashLengths.count)
-        }
-        else
-        {
-            CGContextSetLineDash(context, 0.0, nil, 0)
-        }
         
         let valueToPixelMatrix = transformer.valueToPixelMatrix
         
         var position = CGPoint(x: 0.0, y: 0.0)
         
-        for (var i = _minX; i <= _maxX; i += _xAxis.axisLabelModulus)
-        {
-            position.x = CGFloat(i)
-            position.y = 0.0
-            position = CGPointApplyAffineTransform(position, valueToPixelMatrix)
+        if _xAxis.gridLineDashLengths != nil {
             
-            if (position.x >= viewPortHandler.offsetLeft
-                && position.x <= viewPortHandler.chartWidth)
+            for (var i = _minX+1; i < _maxX; i += 1)
             {
-                _gridLineSegmentsBuffer[0].x = position.x
-                _gridLineSegmentsBuffer[0].y = viewPortHandler.contentTop
-                _gridLineSegmentsBuffer[1].x = position.x
-                _gridLineSegmentsBuffer[1].y = viewPortHandler.contentBottom
-                CGContextStrokeLineSegments(context, _gridLineSegmentsBuffer, 2)
+                position.x = CGFloat(i)
+                position.y = 0.0
+                position = CGPointApplyAffineTransform(position, valueToPixelMatrix)
+                
+                if (position.x >= viewPortHandler.offsetLeft
+                    && position.x <= viewPortHandler.chartWidth)
+                {
+                    if i % _xAxis.axisLabelModulus == 0 {
+                        //old dash line
+                        CGContextSetLineWidth(context, _xAxis.gridLineWidth)
+                        CGContextSetLineDash(context, _xAxis.gridLineDashPhase, _xAxis.gridLineDashLengths, _xAxis.gridLineDashLengths.count)
+                        _gridLineSegmentsBuffer[0].x = position.x
+                        _gridLineSegmentsBuffer[0].y = viewPortHandler.contentTop
+                        _gridLineSegmentsBuffer[1].x = position.x
+                        _gridLineSegmentsBuffer[1].y = viewPortHandler.contentBottom
+                        CGContextStrokeLineSegments(context, _gridLineSegmentsBuffer, 2)
+                        //top hair
+                        CGContextSetLineWidth(context, _xAxis.gridLineWidth+1)
+                        CGContextSetLineDash(context, 0.0, nil, 0)
+                        _gridLineSegmentsBuffer[0].x = position.x
+                        _gridLineSegmentsBuffer[0].y = viewPortHandler.contentTop
+                        _gridLineSegmentsBuffer[1].x = position.x
+                        _gridLineSegmentsBuffer[1].y = viewPortHandler.contentTop + 10
+                        CGContextStrokeLineSegments(context, _gridLineSegmentsBuffer, 2)
+                        //bottom hair
+                        _gridLineSegmentsBuffer[0].x = position.x
+                        _gridLineSegmentsBuffer[0].y = viewPortHandler.contentBottom - 10
+                        _gridLineSegmentsBuffer[1].x = position.x
+                        _gridLineSegmentsBuffer[1].y = viewPortHandler.contentBottom
+                        CGContextStrokeLineSegments(context, _gridLineSegmentsBuffer, 2)
+                    }else{
+                        //short hair line for each skipped x
+                        CGContextSetLineDash(context, 0.0, nil, 0)
+                        CGContextSetLineWidth(context, _xAxis.gridLineWidth+1)
+                        
+                        _gridLineSegmentsBuffer[0].x = position.x
+                        _gridLineSegmentsBuffer[0].y = viewPortHandler.contentTop
+                        _gridLineSegmentsBuffer[1].x = position.x
+                        _gridLineSegmentsBuffer[1].y = viewPortHandler.contentTop + 5
+                        CGContextStrokeLineSegments(context, _gridLineSegmentsBuffer, 2)
+                        
+                        
+                        _gridLineSegmentsBuffer[0].x = position.x
+                        _gridLineSegmentsBuffer[0].y = viewPortHandler.contentBottom - 5
+                        _gridLineSegmentsBuffer[1].x = position.x
+                        _gridLineSegmentsBuffer[1].y = viewPortHandler.contentBottom
+                        CGContextStrokeLineSegments(context, _gridLineSegmentsBuffer, 2)
+                    }
+                }
+            }
+        } else {
+            
+            CGContextSetLineDash(context, 0.0, nil, 0)
+            CGContextSetLineWidth(context, _xAxis.gridLineWidth)
+            for (var i = _minX+1; i < _maxX; i += _xAxis.axisLabelModulus)
+            {
+                position.x = CGFloat(i)
+                position.y = 0.0
+                position = CGPointApplyAffineTransform(position, valueToPixelMatrix)
+                
+                if (position.x >= viewPortHandler.offsetLeft
+                    && position.x <= viewPortHandler.chartWidth)
+                {
+                    _gridLineSegmentsBuffer[0].x = position.x
+                    _gridLineSegmentsBuffer[0].y = viewPortHandler.contentTop
+                    _gridLineSegmentsBuffer[1].x = position.x
+                    _gridLineSegmentsBuffer[1].y = viewPortHandler.contentBottom
+                    CGContextStrokeLineSegments(context, _gridLineSegmentsBuffer, 2)
+                }
             }
         }
         

@@ -282,6 +282,7 @@ public class ChartYAxisRenderer: ChartAxisRendererBase
 
         CGContextSetStrokeColorWithColor(context, _yAxis.gridColor.CGColor)
         CGContextSetLineWidth(context, _yAxis.gridLineWidth)
+        
         if (_yAxis.gridLineDashLengths != nil)
         {
             CGContextSetLineDash(context, _yAxis.gridLineDashPhase, _yAxis.gridLineDashLengths, _yAxis.gridLineDashLengths.count)
@@ -296,17 +297,37 @@ public class ChartYAxisRenderer: ChartAxisRendererBase
         var position = CGPoint(x: 0.0, y: 0.0)
         
         // draw the horizontal grid
-        for (var i = 0, count = _yAxis.entryCount; i < count; i++)
+        for (var i = 0+1, count = _yAxis.entryCount; i < count-1; i++)
         {
             position.x = 0.0
             position.y = CGFloat(_yAxis.entries[i])
             position = CGPointApplyAffineTransform(position, valueToPixelMatrix)
-        
+            
             _gridLineBuffer[0].x = viewPortHandler.contentLeft
             _gridLineBuffer[0].y = position.y
             _gridLineBuffer[1].x = viewPortHandler.contentRight
             _gridLineBuffer[1].y = position.y
             CGContextStrokeLineSegments(context, _gridLineBuffer, 2)
+            
+            if _yAxis.gridLineDashLengths != nil {
+                //hair line
+                CGContextSetLineWidth(context, _yAxis.gridLineWidth+1)
+                CGContextSetLineDash(context, 0.0, nil, 0)
+                _gridLineBuffer[0].x = viewPortHandler.contentLeft
+                _gridLineBuffer[0].y = position.y
+                _gridLineBuffer[1].x = viewPortHandler.contentLeft + 10
+                _gridLineBuffer[1].y = position.y
+                CGContextStrokeLineSegments(context, _gridLineBuffer, 2)
+                _gridLineBuffer[0].x = viewPortHandler.contentRight - 10
+                _gridLineBuffer[0].y = position.y
+                _gridLineBuffer[1].x = viewPortHandler.contentRight
+                _gridLineBuffer[1].y = position.y
+                CGContextStrokeLineSegments(context, _gridLineBuffer, 2)
+                //reset
+                CGContextSetLineWidth(context, _yAxis.gridLineWidth)
+                CGContextSetLineDash(context, _yAxis.gridLineDashPhase, _yAxis.gridLineDashLengths, _yAxis.gridLineDashLengths.count)
+            }
+            
         }
         
         CGContextRestoreGState(context)

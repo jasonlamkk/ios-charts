@@ -1,7 +1,10 @@
 **Version 2.1.6**, synced to [MPAndroidChart #825bd2a](https://github.com/PhilJay/MPAndroidChart/commit/825bd2a)
 
-![alt tag](https://raw.github.com/danielgindi/ios-charts/master/Assets/feature_graphic.png)
-  ![Supported Platforms](https://img.shields.io/cocoapods/p/Charts.svg) [![Releases](https://img.shields.io/github/release/danielgindi/ios-charts.svg)](https://github.com/danielgindi/ios-charts/releases) [![Latest pod release](https://img.shields.io/cocoapods/v/Charts.svg)](http://cocoapods.org/pods/charts)
+![alt tag](https://bitbucket.org/eff_cxinno/ios-charts/raw/master/Assets/feature_graphic.png)
+
+* Major modification :
+added small lines around the border to match the UI design
+
 
 * Xcode 7 / Swift 2.0
 * iOS 7.0 (Drag .swift files to your project)
